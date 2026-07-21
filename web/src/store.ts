@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { api } from './lib/api'
+import { loadUnits, UNITS_KEY, type Units } from './lib/units'
 import type {
   Ball,
   Calibration,
@@ -20,7 +21,9 @@ interface CueLabStore {
   config: Config | null
   calibration: Calibration | null
   lastEvent: EventMsg | null
+  units: Units
 
+  setUnits: (u: Units) => void
   setWsStatus: (s: WsStatus) => void
   setLiveState: (balls: Ball[], moving: boolean, ts: number) => void
   setGame: (g: GameSnapshot | null) => void
