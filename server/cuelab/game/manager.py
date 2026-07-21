@@ -212,7 +212,11 @@ class GameManager:
         return self.spawn(runner())
 
     def cancel_tasks(self) -> None:
+        try:
+            current = asyncio.current_task()
+        except RuntimeError:
+            current = None
         for task in list(self._tasks):
-            if not task.done():
+            if task is not current and not task.done():
                 task.cancel()
         self._tasks.clear()
