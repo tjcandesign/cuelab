@@ -419,14 +419,24 @@ export default function DrillEditor() {
               return (
                 <g key={b.id} style={{ cursor: 'grab' }}>
                   {isSel && <circle cx={b.x} cy={b.y} r={BALL_R + 14} fill="none" stroke="#fff" strokeWidth={4} strokeDasharray="8 7" />}
+                  {stripe && (
+                    <defs>
+                      <clipPath id={`ballclip-${b.id}`}>
+                        <circle cx={b.x} cy={b.y} r={BALL_R} />
+                      </clipPath>
+                    </defs>
+                  )}
                   <circle cx={b.x} cy={b.y} r={BALL_R} fill={stripe ? '#f2efe2' : color} stroke="rgba(0,0,0,0.45)" strokeWidth={2} />
                   {stripe && (
-                    <path
-                      d={`M ${b.x - BALL_R} ${b.y} a ${BALL_R} ${BALL_R} 0 0 1 ${BALL_R * 2} 0 z`}
-                      fill="none"
+                    <rect
+                      x={b.x - BALL_R}
+                      y={b.y - BALL_R * 0.5}
+                      width={BALL_R * 2}
+                      height={BALL_R}
+                      fill={color}
+                      clipPath={`url(#ballclip-${b.id})`}
                     />
                   )}
-                  {stripe && <rect x={b.x - BALL_R} y={b.y - BALL_R * 0.5} width={BALL_R * 2} height={BALL_R} fill={color} clipPath={`circle(${BALL_R}px at ${b.x}px ${b.y}px)`} />}
                   {(b.number ?? 0) > 0 && (
                     <>
                       <circle cx={b.x} cy={b.y} r={BALL_R * 0.55} fill="#f5f2e8" />
