@@ -46,7 +46,12 @@ export const useStore = create<CueLabStore>((set) => ({
   config: null,
   calibration: null,
   lastEvent: null,
+  units: loadUnits(),
 
+  setUnits: (units) => {
+    localStorage.setItem(UNITS_KEY, units)
+    set({ units })
+  },
   setWsStatus: (wsStatus) => set({ wsStatus }),
   setLiveState: (balls, moving, stateTs) => set({ balls, moving, stateTs }),
   setGame: (game) => set({ game }),
