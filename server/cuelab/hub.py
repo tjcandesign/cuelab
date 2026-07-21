@@ -18,7 +18,6 @@ class Hub:
 
     async def connect(self, ws: WebSocket) -> None:
         await ws.accept()
-        self.clients[ws] = "viewer"
         for key in ("state", "game", "scene"):
             msg = self.latest.get(key)
             if msg is None:
