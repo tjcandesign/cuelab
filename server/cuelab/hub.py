@@ -32,6 +32,7 @@ class Hub:
             except Exception:
                 self.disconnect(ws)
                 return
+        self.clients[ws] = "viewer"
 
     def disconnect(self, ws: WebSocket) -> None:
         self.clients.pop(ws, None)
