@@ -12,6 +12,8 @@ const LINKS: { to: string; label: string }[] = [
 
 export default function Shell() {
   const wsStatus = useStore((s) => s.wsStatus)
+  const units = useStore((s) => s.units)
+  const setUnits = useStore((s) => s.setUnits)
 
   return (
     <div className="shell">
@@ -26,6 +28,14 @@ export default function Shell() {
               {l.label}
             </NavLink>
           ))}
+        </div>
+        <div className="units-toggle" title="Measurement units">
+          <button className={units === 'standard' ? 'on' : ''} onClick={() => setUnits('standard')}>
+            Standard
+          </button>
+          <button className={units === 'metric' ? 'on' : ''} onClick={() => setUnits('metric')}>
+            Metric
+          </button>
         </div>
         <div className={`conn-pill ${wsStatus}`}>
           <span className="led" />
