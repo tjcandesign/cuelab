@@ -234,7 +234,11 @@ export default function LiveTable({ interactive = true }: { interactive?: boolea
     if (!isSim()) return
     const ball = ballAt(x, y)
     if (!ball) return
-    e.currentTarget.setPointerCapture(e.pointerId)
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId)
+    } catch {
+      // synthetic events / lost pointers have no capturable id
+    }
     if (e.shiftKey && (ball.kind === 'cue' || ball.id === 'cue')) {
       aimRef.current = { fromX: ball.x, fromY: ball.y, x, y, ballId: ball.id }
     } else {
