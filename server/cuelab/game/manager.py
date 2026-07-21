@@ -184,6 +184,11 @@ class GameManager:
             self._last_scene_json = scene_json
             await self.hub.broadcast({"type": "scene", "items": items})
 
+    async def refresh_scene(self) -> None:
+        """Force a scene re-broadcast (e.g. after out-of-band projections)."""
+        self._last_scene_json = None
+        await self.push()
+
     # --------------------------------------------------------------- tasks
 
     def spawn(self, coro: Awaitable[None]) -> asyncio.Task:
