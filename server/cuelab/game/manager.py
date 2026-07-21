@@ -178,9 +178,7 @@ class GameManager:
         """Broadcast the game snapshot and (if changed) the projector scene."""
         snap = self.snapshot()
         await self.hub.broadcast({"type": "game", "game": snap})
-        items = self.active.scene() if self.active and not self.active.ended else []
-        if self.active and self.active.ended:
-            items = self.active.scene()
+        items = self.active.scene() if self.active else []
         scene_json = json.dumps(items, sort_keys=True)
         if scene_json != self._last_scene_json:
             self._last_scene_json = scene_json
