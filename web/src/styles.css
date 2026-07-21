@@ -672,6 +672,11 @@ input[type='range']::-moz-range-thumb {
   .wizard {
     grid-template-columns: 1fr;
   }
+  .steprail {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
 }
 
 .steprail {
