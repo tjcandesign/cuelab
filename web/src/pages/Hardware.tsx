@@ -48,6 +48,7 @@ const CAMERAS: CameraRef[] = [
 type Verdict = { state: 'green' | 'amber' | 'red'; title: string; details: string[] }
 
 export default function Hardware() {
+  const units = useStore((s) => s.units)
   const [tab, setTab] = useState<'projector' | 'camera'>('projector')
   const [tableSize, setTableSize] = useState('8ft')
   const [mountH, setMountH] = useState(1.6) // meters above the table surface
