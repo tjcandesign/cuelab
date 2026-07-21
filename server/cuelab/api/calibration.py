@@ -115,4 +115,4 @@ async def verify(cl: CueLab = Depends(get_cl)) -> dict[str, Any]:
         return {"ok": False, "errorsMm": None, "note": f"verify failed: {exc}"}
     finally:
         # restore the game scene
-        await cl.game.push()
+        await cl.game.refresh_scene()
