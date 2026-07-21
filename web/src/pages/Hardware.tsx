@@ -4,6 +4,8 @@
 
 import { useMemo, useState } from 'react'
 import { BALL_D, TABLE_PRESETS } from '../lib/geometry'
+import { useStore } from '../store'
+import { fmtDensity, fmtDim, fmtFeetIn, fmtHeight, fmtLen, type Units } from '../lib/units'
 
 const ASPECTS: Record<string, number> = { '16:9': 16 / 9, '16:10': 16 / 10, '4:3': 4 / 3 }
 const MARGIN_MM = 150 // projector margin beyond the playing surface, per side
