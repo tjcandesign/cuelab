@@ -367,9 +367,11 @@ function ModeCard() {
           value={config?.tableSize ?? '8ft'}
           onChange={(e) => void put({ tableSize: e.target.value })}
         >
-          <option value="7ft">7ft — 1981 × 991 mm</option>
-          <option value="8ft">8ft — 2235 × 1118 mm</option>
-          <option value="9ft">9ft — 2540 × 1270 mm</option>
+          {Object.entries(TABLE_PRESETS).map(([key, d]) => (
+            <option key={key} value={key}>
+              {key} — {fmtDim(d.L, d.W, units)}
+            </option>
+          ))}
         </select>
       </div>
 
