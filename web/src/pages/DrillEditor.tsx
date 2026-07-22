@@ -486,6 +486,7 @@ function EditorSidebar({
   selTargetIndex: number | null
   canSend: boolean
 }) {
+  const units = useStore((s) => s.units)
   const sc = drill.successCriteria ?? {}
   const objectBalls = drill.balls.filter((b) => b.id !== 'cue')
   const selTarget = selTargetIndex !== null ? (drill.targets ?? [])[selTargetIndex] : undefined
