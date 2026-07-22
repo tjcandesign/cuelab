@@ -454,9 +454,9 @@ export default function DrillEditor() {
           <div className="table-meta">
             <span className="microlabel">
               {selBall
-                ? `${selBall.id} · x ${selBall.x.toFixed(1)} mm · y ${selBall.y.toFixed(1)} mm`
+                ? `${selBall.id} · x ${fmtLen(selBall.x, units)} · y ${fmtLen(selBall.y, units)}`
                 : selTarget?.c
-                  ? `target · c ${selTarget.c[0]}, ${selTarget.c[1]} · radii ${selTarget.radii.join('/')}`
+                  ? `target · c ${fmtLen(selTarget.c[0], units)}, ${fmtLen(selTarget.c[1], units)} · radii ${selTarget.radii.map((r) => fmtLen(r, units, 0)).join(' / ')}`
                   : 'click a pocket to call it · right-click a ball to remove'}
             </span>
             <span className="microlabel">{drill.table ?? '8ft'} table</span>
