@@ -273,6 +273,7 @@ function ProjectorStep({ onNext }: { onNext: () => void }) {
 /* ---------------- step 3: verify ---------------- */
 
 function VerifyStep() {
+  const units = useStore((s) => s.units)
   const [busy, setBusy] = useState(false)
   const [result, setResult] = useState<VerifyResult | null>(null)
   const [err, setErr] = useState<string | null>(null)
