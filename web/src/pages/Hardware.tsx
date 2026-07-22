@@ -97,20 +97,20 @@ export default function Hardware() {
         const shortW = Math.max(0, proj.needW - proj.imageW)
         const shortH = Math.max(0, proj.needH - proj.imageH)
         const parts: string[] = []
-        if (shortW > 0) parts.push(`image is ${Math.round(shortW)} mm too narrow along the table length`)
-        if (shortH > 0) parts.push(`image is ${Math.round(shortH)} mm too short across the table width`)
+        if (shortW > 0) parts.push(`image is ${fmtLen(shortW, units)} too narrow along the table length`)
+        if (shortH > 0) parts.push(`image is ${fmtLen(shortH, units)} too short across the table width`)
         parts.push('raise the mount, or use a shorter throw ratio')
         return { state: 'red', title: "This setup won't work", details: parts }
       }
       const caveats: string[] = []
-      if (proj.pxPerMm < 1.2) caveats.push(`resolution is marginal: ${proj.pxPerMm.toFixed(2)} px/mm — fine lines will look soft`)
+      if (proj.pxPerMm < 1.2) caveats.push(`resolution is marginal: ${fmtDensity(proj.pxPerMm, units)} — fine lines will look soft`)
       if (proj.lux < 350) caveats.push(`brightness is low: ~${Math.round(proj.lux)} lux on the table — dim the room lights`)
       if (throwRatio <= 0.45 || throwRatio >= 2.4) caveats.push('throw ratio is at the edge of the slider range — double-check the projector spec')
       if (caveats.length > 0) return { state: 'amber', title: 'Will work with caveats', details: caveats }
       return {
         state: 'green',
         title: 'This setup works',
-        details: [`${Math.round(proj.imageW)} × ${Math.round(proj.imageH)} mm image · ${proj.pxPerMm.toFixed(2)} px/mm · ~${Math.round(proj.lux)} lux`],
+        details: [`${fmtDim(proj.imageW, proj.imageH, units)} image · ${fmtDensity(proj.pxPerMm, units)} · ~${Math.round(proj.lux)} lux`],
       }
     }
     // camera
@@ -118,27 +118,25 @@ export default function Hardware() {
       const shortW = Math.max(0, L - cam.fpW)
       const shortH = Math.max(0, W - cam.fpH)
       const parts: string[] = []
-      if (shortW > 0) parts.push(`footprint is ${Math.round(shortW)} mm short along the table length`)
-      if (shortH > 0) parts.push(`footprint is ${Math.round(shortH)} mm short across the table width`)
+      if (shortW > 0) parts.push(`footprint is ${fmtLen(shortW, units)} short along the table length`)
+      if (shortH > 0) parts.push(`footprint is ${fmtLen(shortH, units)} short across the table width`)
       parts.push('raise the mount or use a wider FOV')
       return { state: 'red', title: "This setup won't work", details: parts }
     }
     const caveats: string[] = []
     if (cam.pxPerMm < 0.35)
-      caveats.push(`only ${cam.pxPerMm.toFixed(2)} px/mm (${Math.round(cam.pxPerBall)} px per ball) — below the 0.35 px/mm (20 px/ball) detection floor; use a higher resolution or lower mount`)
+      caveats.push(`only ${fmtDensity(cam.pxPerMm, units)} (${Math.round(cam.pxPerBall)} px per ball) — below the ${fmtDensity(0.35, units)} (20 px/ball) detection floor; use a higher resolution or lower mount`)
     else if (cam.pxPerMm < 0.5)
-      caveats.push(`${cam.pxPerMm.toFixed(2)} px/mm (${Math.round(cam.pxPerBall)} px per ball) is workable but marginal for clean detection`)
+      caveats.push(`${fmtDensity(cam.pxPerMm, units)} (${Math.round(cam.pxPerBall)} px per ball) is workable but marginal for clean detection`)
     if (fov >= 105) caveats.push('very wide FOV — expect lens distortion at the rails; calibrate carefully')
     if (caveats.length > 0) return { state: 'amber', title: 'Will work with caveats', details: caveats }
     return {
       state: 'green',
       title: 'This setup works',
-      details: [`${Math.round(cam.fpW)} × ${Math.round(cam.fpH)} mm footprint · ${cam.pxPerMm.toFixed(2)} px/mm · ${Math.round(cam.pxPerBall)} px per ball`],
+      details: [`${fmtDim(cam.fpW, cam.fpH, units)} footprint · ${fmtDensity(cam.pxPerMm, units)} · ${Math.round(cam.pxPerBall)} px per ball`],
     }
-  }, [tab, proj, cam, throwRatio, fov, L, W])
+  }, [tab, proj, cam, throwRatio, fov, L, W, units])
 
-  const inches = (mountH * 39.3701).toFixed(0)
-  const cm = (mountH * 100).toFixed(0)
   const footprintW = tab === 'projector' ? proj.imageW : cam.fpW
 
   return (
