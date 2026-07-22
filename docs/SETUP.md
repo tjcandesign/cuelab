@@ -30,7 +30,7 @@ Mount it right next to the projector, looking straight down. To check whether a 
 footprint = 2 x height x tan(FOV / 2)
 ```
 
-At 1.65 m, covering the 2.24 m long side needs a horizontal FOV of at least 2 x atan(2.24 / (2 x 1.65)) = 68 degrees. A Logitech C920 (78 degrees diagonal, ~70 horizontal) just barely makes it and leaves no margin, so a wide-angle board camera is the safer buy: the ELP wide-angle USB modules (90-120 degree lenses, ~$40-60) cover the table with room to spare, and lens distortion is absorbed by the camera calibration step. A Wyze cam flashed with RTSP firmware also works if you would rather run it over the network; point the camera source in config at the RTSP URL instead of a USB index.
+At 65 inches up, covering the 88 inch long side needs a horizontal FOV of at least 2 x atan(88 / (2 x 65)) = 68 degrees. A Logitech C920 (78 degrees diagonal, ~70 horizontal) just barely makes it and leaves no margin, so a wide-angle board camera is the safer buy: the ELP wide-angle USB modules (90-120 degree lenses, ~$40-60) cover the table with room to spare, and lens distortion is absorbed by the camera calibration step. A Wyze cam flashed with RTSP firmware also works if you would rather run it over the network; point the camera source in config at the RTSP URL instead of a USB index.
 
 The wizard handles the rest. The camera does not need to be perfectly centered or square, it just needs the full playing surface in frame.
 
