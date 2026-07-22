@@ -305,7 +305,7 @@ function VerifyStep() {
           <strong>{result.ok ? 'PASS — calibration verified' : 'FAIL — calibration is off'}</strong>
           {Array.isArray(result.errorsMm) && result.errorsMm.length > 0 && (
             <div className="mono mt8" style={{ fontSize: 12.5 }}>
-              errors: {result.errorsMm.map((e) => `${Number(e).toFixed(1)}mm`).join(' · ')}
+              errors: {result.errorsMm.map((e) => fmtOffset(Number(e), units)).join(' · ')}
             </div>
           )}
           {result.note && <div className="mt8" style={{ fontSize: 13 }}>{result.note}</div>}
