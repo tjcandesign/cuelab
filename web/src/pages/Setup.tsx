@@ -322,6 +322,7 @@ function VerifyStep() {
 
 function ModeCard() {
   const config = useStore((s) => s.config)
+  const units = useStore((s) => s.units)
   const loadConfig = useStore((s) => s.loadConfig)
   const [source, setSource] = useState<string>('')
   const [err, setErr] = useState<string | null>(null)
