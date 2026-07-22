@@ -10,7 +10,7 @@ The projector mounts directly above the table pointing straight down, so the ima
 image width = mount height / throw ratio
 ```
 
-Worked example for the default 8ft table. The playing surface is 2235 x 1118 mm. Say the lens ends up 1.65 m above the slate (typical for a ~9-10 ft ceiling once the mount and the table height are subtracted). To get a 2.24 m wide image from 1.65 m away you need a throw ratio of 1.65 / 2.24 = 0.74 or less. Build in a little margin for mount placement and lens position and shop for **throw ratio <= ~0.72**, which means a short-throw unit. A standard-throw projector (ratio 1.2-1.5) would need to hang 3+ meters up and is a non-starter under normal ceilings.
+Worked example for the default 8ft table. The playing surface is 88 x 44 inches. Say the lens ends up 65 inches (5' 5") above the slate, which is typical under a 9-10 ft ceiling once the mount and the table height are subtracted. To throw an 88 inch wide image from 65 inches away you need a throw ratio of 65 / 88 = 0.74 or less. Build in a little margin for mount placement and lens position and shop for **throw ratio <= ~0.72**, which means a short-throw unit. A standard-throw projector (ratio 1.2-1.5) would need to hang 10+ feet up and is a non-starter under normal ceilings.
 
 Good candidates: BenQ TH671ST (0.69-0.83, use the wide end) or ViewSonic PS502W (~0.49). Used units are completely fine for this, the projector only ever shows lines and text on black, and they typically run $250-500 on eBay or Facebook Marketplace. 1080p is plenty; at table scale one projector pixel is about 1.2 mm.
 
