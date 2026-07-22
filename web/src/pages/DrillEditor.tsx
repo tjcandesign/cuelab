@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { ballColor, initialsOf } from '../lib/colors'
 import { BALL_R, clamp, dist, pockets, TABLE_PRESETS } from '../lib/geometry'
+import { fmtLen } from '../lib/units'
 import type { Drill, DrillBall, Player, TargetSpec } from '../lib/types'
 import { useStore } from '../store'
 
