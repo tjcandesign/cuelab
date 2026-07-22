@@ -310,7 +310,7 @@ export default function Hardware() {
   )
 }
 
-function SideView({ L, hMm, footprintW, kind }: { L: number; hMm: number; footprintW: number; kind: 'projector' | 'camera' }) {
+function SideView({ L, hMm, footprintW, kind, units }: { L: number; hMm: number; footprintW: number; kind: 'projector' | 'camera'; units: Units }) {
   const vw = 720
   const vh = 340
   const surfaceY = 260
