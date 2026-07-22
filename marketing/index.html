@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CueLab — projection pool training on your own table</title>
+<meta name="description" content="CueLab projects games and drills onto a real pool table, tracks every ball with an overhead camera, and scores every shot automatically. Runs on a Mac mini, works offline." />
+<style>
+  :root {
+    --bg: #0b0b10;
+    --bg2: #08080c;
+    --panel: #15151c;
+    --border: #26262f;
+    --text: #e8e8ef;
+    --dim: #8b8b98;
+    --accent: #8b5cf6;
+    --accent-soft: rgba(139, 92, 246, 0.14);
+    --success: #34d399;
+    --mono: ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+
+  .micro {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  /* nav */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(11, 11, 16, 0.82);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .navrow { display: flex; align-items: center; gap: 30px; height: 60px; }
+  .wordmark { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 9px; }
+  .wordmark .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+  .wordmark em { font-style: normal; color: var(--accent); }
+  .navlinks { display: flex; gap: 24px; margin-left: auto; font-size: 14px; color: var(--dim); }
+  .navlinks a:hover { color: var(--text); }
+  .navcta {
+    font-size: 13.5px; font-weight: 600;
+    background: var(--accent); color: #fff;
+    padding: 8px 16px; border-radius: 999px;
+  }
+  .navcta:hover { filter: brightness(1.1); }
+
+  /* hero */
+  header { position: relative; overflow: hidden; }
+  .hero-glow {
+    position: absolute; left: 50%; top: -340px; transform: translateX(-50%);
+    width: 1100px; height: 700px; pointer-events: none;
+    background: radial-gradient(closest-side, rgba(139, 92, 246, 0.16), transparent 70%);
+  }
+  .hero { text-align: center; padding: 96px 0 0; position: relative; }
+  .hero .micro { color: var(--accent); }
+  h1 {
+    font-size: clamp(40px, 6.4vw, 74px);
+    line-height: 1.03; letter-spacing: -0.028em; font-weight: 800;
+    margin: 18px auto 22px; max-width: 820px;
+  }
+  .sub { font-size: 19px; color: var(--dim); max-width: 620px; margin: 0 auto 34px; }
+  .ctas { display: flex; gap: 14px; justify-content: center; margin-bottom: 70px; }
+  .btn {
+    display: inline-block; font-weight: 600; font-size: 15px;
+    padding: 13px 26px; border-radius: 12px;
+  }
+  .btn.primary { background: var(--accent); color: #fff; }
+  .btn.primary:hover { filter: brightness(1.1); }
+  .btn.ghost { border: 1px solid var(--border); color: var(--text); }
+  .btn.ghost:hover { border-color: var(--dim); }
+
+  .shot {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--panel);
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
+  }
+  .hero .shot { margin-bottom: -2px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+
+  /* badge strip */
+  .strip { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--bg2); }
+  .striprow {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 14px 44px; padding: 20px 0;
+  }
+  .striprow span { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+  .striprow b { color: var(--text); font-weight: 500; }
+
+  /* sections */
+  section { padding: 104px 0; }
+  section.tight { padding: 84px 0; }
+  .eyebrow { color: var(--accent); margin-bottom: 12px; }
+  h2 { font-size: clamp(28px, 3.6vw, 42px); letter-spacing: -0.02em; line-height: 1.12; font-weight: 750; margin-bottom: 16px; }
+  .lead { color: var(--dim); font-size: 16.5px; max-width: 560px; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 52px; }
+  .step { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 26px 24px; }
+  .step .num {
+    font-family: var(--mono); font-size: 12px; color: var(--accent);
+    display: inline-block; margin-bottom: 14px;
+  }
+  .step h3 { font-size: 18px; margin-bottom: 8px; font-weight: 650; }
+  .step p { color: var(--dim); font-size: 14.5px; }
+
+  .feature { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .feature.rev .copy { order: 2; }
+  .feature .copy h2 { max-width: 420px; }
+  .feature ul { list-style: none; margin-top: 22px; display: grid; gap: 12px; }
+  .feature li { color: var(--dim); font-size: 15px; padding-left: 22px; position: relative; }
+  .feature li::before {
+    content: ''; position: absolute; left: 0; top: 8px;
+    width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+  }
+  .feature li b { color: var(--text); font-weight: 550; }
+
+  /* projector full-bleed */
+  .projector-band { background: #000; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: center; }
+  .projector-band .micro { color: var(--dim); }
+  .projector-band h2 { margin: 12px auto 10px; }
+  .projector-band .lead { margin: 0 auto 46px; }
+  .projector-band img { margin: 0 auto; }
+
+  /* hardware */
+  .hw { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+  .hw-table { margin-top: 26px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .hw-row { display: flex; justify-content: space-between; gap: 20px; padding: 13px 18px; border-bottom: 1px solid var(--border); font-size: 14.5px; }
+  .hw-row:last-child { border-bottom: none; }
+  .hw-row span:first-child { color: var(--dim); }
+  .hw-row span:last-child { font-family: var(--mono); font-size: 13px; }
+
+  /* sim callout */
+  .sim {
+    background: linear-gradient(180deg, var(--accent-soft), transparent 140%);
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    border-radius: 18px;
+    padding: 56px 48px;
+    text-align: center;
+  }
+  .sim h2 { margin-bottom: 12px; }
+  .sim .lead { margin: 0 auto 28px; }
+
+  /* roadmap */
+  .roadmap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 44px; }
+  .road { border: 1px solid var(--border); border-radius: 14px; padding: 22px; }
+  .road .micro { margin-bottom: 10px; display: block; }
+  .road .micro.now { color: var(--success); }
+  .road h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .road p { font-size: 14px; color: var(--dim); }
+
+  footer { border-top: 1px solid var(--border); padding: 36px 0 48px; }
+  .footrow { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+  footer .micro { letter-spacing: 0.1em; }
+
+  .fade { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .fade.in { opacity: 1; transform: none; }
+
+  @media (max-width: 880px) {
+    .navlinks { display: none; }
+    .steps, .roadmap { grid-template-columns: 1fr; }
+    .feature, .hw { grid-template-columns: 1fr; gap: 30px; }
+    .feature.rev .copy { order: 0; }
+    .ctas { flex-direction: column; align-items: center; }
+    section { padding: 70px 0; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap navrow">
+    <a class="wordmark" href="#top"><span class="dot"></span>Cue<em>Lab</em></a>
+    <div class="navlinks">
+      <a href="#how">How it works</a>
+      <a href="#games">Games</a>
+      <a href="#stats">Stats</a>
+      <a href="#hardware">Hardware</a>
+    </div>
+    <a class="navcta" href="#hardware">Plan your rig</a>
+  </div>
+</nav>
+
+<header id="top">
+  <div class="hero-glow"></div>
+  <div class="wrap hero">
+    <span class="micro">Projection pool trainer</span>
+    <h1>The table is the screen.</h1>
+    <p class="sub">CueLab projects games and drills straight onto your cloth, watches every ball with an overhead camera, and scores each shot the moment it settles. It runs on a Mac mini and never needs the internet.</p>
+    <div class="ctas">
+      <a class="btn primary" href="#how">See how it works</a>
+      <a class="btn ghost" href="#sim">Try it with no hardware</a>
+    </div>
+    <div class="shot fade"><img src="assets/play.png" alt="CueLab control screen during a live Target Pool game" /></div>
+  </div>
+</header>
+
+<div class="strip">
+  <div class="wrap striprow">
+    <span>Runs on a <b>Mac mini</b></span>
+    <span><b>Fully offline</b> at bars and tournaments</span>
+    <span>Any table, <b>7 to 9 ft</b></span>
+    <span>About <b>$500 in used gear</b></span>
+  </div>
+</div>
+
+<section id="how">
+  <div class="wrap">
+    <div class="eyebrow micro">How it works</div>
+    <h2>Three pieces of hardware.<br />One loop.</h2>
+    <p class="lead">A short-throw projector points straight down at the cloth. A cheap webcam sits beside it. The software closes the loop between what you see and what you shot.</p>
+    <div class="steps">
+      <div class="step fade">
+        <span class="num">01 — PROJECT</span>
+        <h3>Drills appear on the cloth</h3>
+        <p>Target rings, ghost-ball positions, called pockets, and countdowns render on the table itself. Black projects as nothing, so the surface stays clean except for the lines that matter.</p>
+      </div>
+      <div class="step fade">
+        <span class="num">02 — TRACK</span>
+        <h3>The camera reads the table</h3>
+        <p>An overhead camera finds every ball 30 times a second and maps it to real table coordinates. Calibration takes about ten minutes and holds until someone moves the mount.</p>
+      </div>
+      <div class="step fade">
+        <span class="num">03 — SCORE</span>
+        <h3>Shots score themselves</h3>
+        <p>CueLab detects the shot, the pocket, the scratch, and where the cue ball came to rest. Nobody keeps score on a napkin and nobody argues about the ring.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="games" class="tight">
+  <div class="wrap feature">
+    <div class="copy fade">
+      <div class="eyebrow micro">Target Pool</div>
+      <h2>A game your table couldn't play before.</h2>
+      <p class="lead">Each round, one player sets the table and calls a pocket. A bullseye drops somewhere random. Everyone shoots the same layout.</p>
+      <ul>
+        <li><b>Ghost positions</b> show exactly where the balls go back after every shot.</li>
+        <li><b>6, 4, or 2 points</b> for landing the cue ball in the rings after making the called ball.</li>
+        <li><b>Up to five players</b>, setter rotates, every attempt saved.</li>
+      </ul>
+    </div>
+    <div class="shot fade"><img src="assets/tableview.png" alt="Live table view with the projected bullseye" /></div>
+  </div>
+</section>
+
+<div class="projector-band">
+  <section class="tight">
+    <div class="wrap">
+      <span class="micro">The projection layer</span>
+      <h2>This is everything the projector throws.</h2>
+      <p class="lead">Rings, ghosts, and the called-pocket glow on pure black. On the cloth it reads like the table is drawing on itself.</p>
+      <div class="shot fade" style="max-width:900px;margin:0 auto;"><img src="assets/projector.png" alt="Raw projector output: bullseye and called pocket on black" /></div>
+    </div>
+  </section>
+</div>
+
+<section id="stats">
+  <div class="wrap feature rev">
+    <div class="copy fade">
+      <div class="eyebrow micro">Player stats</div>
+      <h2>Every shot goes on your record.</h2>
+      <p class="lead">Attempts, success rate, best streak, balls pocketed, scratches. Each session lands in a per-player dashboard you can put on the wall TV.</p>
+      <ul>
+        <li><b>Session history</b> with scores and shot counts per game.</li>
+        <li><b>Practice honestly.</b> The camera counts the misses you would rather forget.</li>
+        <li><b>Voice commands</b> for hands-free control mid-drill, plus session recording to video.</li>
+      </ul>
+    </div>
+    <div class="shot fade"><img src="assets/stats.png" alt="Player statistics dashboard" /></div>
+  </div>
+</section>
+
+<section class="tight" style="padding-top:0;">
+  <div class="wrap feature">
+    <div class="copy fade">
+      <div class="eyebrow micro">Drill editor</div>
+      <h2>Build drills in the browser, send them to the table.</h2>
+      <p class="lead">Drag balls into position, drop target rings, call a pocket, set the success rule. Save it, export it as a file, hand it to a friend.</p>
+      <ul>
+        <li><b>Position, potting, and custom</b> drill types with per-ring scoring.</li>
+        <li><b>Open JSON format</b>, so drills are files you own, not entries in someone's cloud.</li>
+        <li><b>One click</b> projects the layout onto the table and starts counting attempts.</li>
+      </ul>
+    </div>
+    <div class="shot fade"><img src="assets/drills.png" alt="Drill editor with ball palette and target rings" /></div>
+  </div>
+</section>
+
+<section id="hardware" class="tight" style="background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="wrap hw">
+    <div class="copy fade">
+      <div class="eyebrow micro">Hardware</div>
+      <h2>Used gear is fine.<br />The math is built in.</h2>
+      <p class="lead">The planner takes your ceiling height and table size and tells you whether a given projector and camera will work before you spend a dollar. Verdicts come with exact shortfalls in inches.</p>
+      <div class="hw-table">
+        <div class="hw-row"><span>Short-throw projector, used</span><span>$250–500</span></div>
+        <div class="hw-row"><span>1080p USB webcam</span><span>under $100</span></div>
+        <div class="hw-row"><span>LED perimeter shop lights</span><span>$40–120</span></div>
+        <div class="hw-row"><span>Computer</span><span>the Mac mini you own</span></div>
+        <div class="hw-row"><span>GPU required</span><span>none</span></div>
+      </div>
+    </div>
+    <div class="shot fade"><img src="assets/hardware.png" alt="Hardware planner with projector coverage verdict" /></div>
+  </div>
+</section>
+
+<section id="sim">
+  <div class="wrap">
+    <div class="sim fade">
+      <div class="eyebrow micro">Simulator included</div>
+      <h2>No projector yet? Play tonight anyway.</h2>
+      <p class="lead">CueLab ships with a full physics simulator and a synthetic camera, so every game, drill, and even the calibration flow works on a laptop with zero hardware. Buy the projector after you're hooked.</p>
+      <a class="btn primary" href="#how">Read the setup guide</a>
+    </div>
+  </div>
+</section>
+
+<section class="tight" style="padding-top:0;">
+  <div class="wrap">
+    <div class="eyebrow micro">Where this is going</div>
+    <h2>Built in the open, honestly labeled.</h2>
+    <div class="roadmap">
+      <div class="road fade">
+        <span class="micro now">Working today</span>
+        <h3>The full local loop</h3>
+        <p>Target Pool, 9-ball scoring, drill editor, stats, calibration, voice control, recording, hardware planner, simulator.</p>
+      </div>
+      <div class="road fade">
+        <span class="micro">In progress</span>
+        <h3>Trained ball detector</h3>
+        <p>A small neural detector for rough lighting and busy tables, running on the Mac's Neural Engine. The classical tracker works now on an evenly lit table.</p>
+      </div>
+      <div class="road fade">
+        <span class="micro">Planned</span>
+        <h3>Shared drills and remote games</h3>
+        <p>Publish drills, pull down other people's, and shoot the same layout against a friend in another city.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footrow">
+    <a class="wordmark" href="#top"><span class="dot"></span>Cue<em>Lab</em></a>
+    <span class="micro">Built at the Workhorse studio · Washington, DC</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target) }
+  }, { threshold: 0.12 })
+  document.querySelectorAll('.fade').forEach((el) => io.observe(el))
+</script>
+
+</body>
+</html>
