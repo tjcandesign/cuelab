@@ -10,6 +10,7 @@ import { useEffect, useRef } from 'react'
 import { api } from '../lib/api'
 import { ballColor, isStripe, sceneColor, UI } from '../lib/colors'
 import { BALL_R, clamp, dist, pocketCenter, pockets, tableDims } from '../lib/geometry'
+import { fmtSpeed } from '../lib/units'
 import type { Ball, SceneItem } from '../lib/types'
 import { useStore } from '../store'
 
