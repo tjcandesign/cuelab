@@ -281,7 +281,7 @@ export default function Hardware() {
 
           <div className="card mb16">
             <div className="microlabel card-title">Side view</div>
-            <SideView L={L} hMm={hMm} footprintW={footprintW} kind={tab} />
+            <SideView L={L} hMm={hMm} footprintW={footprintW} kind={tab} units={units} />
           </div>
 
           <div className="card">
