@@ -51,7 +51,7 @@ export default function Hardware() {
   const units = useStore((s) => s.units)
   const [tab, setTab] = useState<'projector' | 'camera'>('projector')
   const [tableSize, setTableSize] = useState('8ft')
-  const [mountH, setMountH] = useState(1.6) // meters above the table surface
+  const [mountH, setMountH] = useState(1.85) // meters above the table surface
 
   // projector
   const [throwRatio, setThrowRatio] = useState(0.69)
