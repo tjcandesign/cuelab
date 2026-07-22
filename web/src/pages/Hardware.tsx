@@ -160,17 +160,17 @@ export default function Hardware() {
             <div className="formrow">
               <span className="microlabel">Table size</span>
               <select className="field" value={tableSize} onChange={(e) => setTableSize(e.target.value)}>
-                <option value="7ft">7ft — 1981 × 991 mm</option>
-                <option value="8ft">8ft — 2235 × 1118 mm</option>
-                <option value="9ft">9ft — 2540 × 1270 mm</option>
+                {Object.entries(TABLE_PRESETS).map(([key, d]) => (
+                  <option key={key} value={key}>
+                    {key} — {fmtDim(d.L, d.W, units)}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="slider-row">
               <div className="top">
                 <span className="microlabel">Height above table</span>
-                <span className="valtext">
-                  {mountH.toFixed(2)} m · {cm} cm · {inches}″
-                </span>
+                <span className="valtext">{fmtHeight(hMm, units)}</span>
               </div>
               <input type="range" min={0.5} max={3} step={0.05} value={mountH} onChange={(e) => setMountH(Number(e.target.value))} />
             </div>
