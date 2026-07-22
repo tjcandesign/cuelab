@@ -345,11 +345,11 @@ function SideView({ L, hMm, footprintW, kind, units }: { L: number; hMm: number;
       {/* height annotation */}
       <line x1={cx - tableHalf - 44} y1={mountY} x2={cx - tableHalf - 44} y2={surfaceY} stroke="#8b8b98" strokeWidth={1} strokeDasharray="3 4" />
       <text x={cx - tableHalf - 52} y={(mountY + surfaceY) / 2} fill="#8b8b98" fontSize={12} fontFamily="ui-monospace, monospace" textAnchor="end" dominantBaseline="central">
-        {(hMm / 1000).toFixed(2)}m
+        {units === 'metric' ? `${(hMm / 1000).toFixed(2)}m` : fmtFeetIn(hMm)}
       </text>
       {/* footprint annotation */}
       <text x={cx} y={surfaceY + 96} fill="#8b8b98" fontSize={12} fontFamily="ui-monospace, monospace" textAnchor="middle">
-        {kind === 'projector' ? 'image' : 'footprint'} {Math.round(footprintW)} mm · table {Math.round(L)} mm
+        {kind === 'projector' ? 'image' : 'footprint'} {fmtLen(footprintW, units, 0)} · table {fmtLen(L, units, 0)}
       </text>
     </svg>
   )
