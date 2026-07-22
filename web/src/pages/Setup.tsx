@@ -292,7 +292,7 @@ function VerifyStep() {
     <div className="card">
       <div className="microlabel card-title">Step 3 — verify</div>
       <p className="muted" style={{ marginTop: 0, fontSize: 13.5 }}>
-        The server projects markers, detects them through the camera, and reports the offsets in mm.
+        The server projects markers, detects them through the camera, and reports the offsets.
       </p>
       <button className="btn primary" disabled={busy} onClick={() => void run()}>
         {busy ? 'Verifying…' : 'Run verification'}
