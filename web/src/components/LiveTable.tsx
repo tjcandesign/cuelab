@@ -161,7 +161,7 @@ export default function LiveTable({ interactive = true }: { interactive?: boolea
         ctx.fillStyle = '#ffffff'
         ctx.textAlign = 'left'
         ctx.textBaseline = 'bottom'
-        ctx.fillText(`${Math.round(speed)} mm/s`, bx2 + 10, by2 - 6)
+        ctx.fillText(fmtSpeed(speed, useStore.getState().units), bx2 + 10, by2 - 6)
       }
 
       // call_pocket affordance
