@@ -288,19 +288,19 @@ export default function Hardware() {
             <div className="microlabel card-title">Numbers</div>
             {tab === 'projector' ? (
               <>
-                <div className="kv"><span>Image at table</span><span className="v">{Math.round(proj.imageW)} × {Math.round(proj.imageH)} mm</span></div>
-                <div className="kv"><span>Required (surface + {MARGIN_MM} mm margin)</span><span className="v">{Math.round(proj.needW)} × {Math.round(proj.needH)} mm</span></div>
+                <div className="kv"><span>Image at table</span><span className="v">{fmtDim(proj.imageW, proj.imageH, units)}</span></div>
+                <div className="kv"><span>Required (surface + {fmtLen(MARGIN_MM, units, 0)} margin)</span><span className="v">{fmtDim(proj.needW, proj.needH, units)}</span></div>
                 <div className="kv"><span>Coverage</span><span className="v">{proj.covOk ? 'covers table' : 'DOES NOT COVER'}</span></div>
-                <div className="kv"><span>Projection density</span><span className="v">{proj.pxPerMm.toFixed(2)} px/mm</span></div>
+                <div className="kv"><span>Projection density</span><span className="v">{fmtDensity(proj.pxPerMm, units)}</span></div>
                 <div className="kv"><span>Illuminance on table (rough)</span><span className="v">~{Math.round(proj.lux)} lux</span></div>
               </>
             ) : (
               <>
-                <div className="kv"><span>Footprint at table</span><span className="v">{Math.round(cam.fpW)} × {Math.round(cam.fpH)} mm</span></div>
-                <div className="kv"><span>Playing surface</span><span className="v">{Math.round(L)} × {Math.round(W)} mm</span></div>
+                <div className="kv"><span>Footprint at table</span><span className="v">{fmtDim(cam.fpW, cam.fpH, units)}</span></div>
+                <div className="kv"><span>Playing surface</span><span className="v">{fmtDim(L, W, units)}</span></div>
                 <div className="kv"><span>Coverage</span><span className="v">{cam.covOk ? 'covers table' : 'DOES NOT COVER'}</span></div>
-                <div className="kv"><span>Detection density</span><span className="v">{cam.pxPerMm.toFixed(2)} px/mm</span></div>
-                <div className="kv"><span>Pixels per ball (⌀{BALL_D} mm, want ≥ 20)</span><span className="v">{Math.round(cam.pxPerBall)} px</span></div>
+                <div className="kv"><span>Detection density</span><span className="v">{fmtDensity(cam.pxPerMm, units)}</span></div>
+                <div className="kv"><span>Pixels per ball (⌀{fmtLen(BALL_D, units, 2)}, want ≥ 20)</span><span className="v">{Math.round(cam.pxPerBall)} px</span></div>
               </>
             )}
           </div>
