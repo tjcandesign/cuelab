@@ -3,6 +3,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../lib/api'
+import { TABLE_PRESETS } from '../lib/geometry'
+import { fmtDim, fmtOffset } from '../lib/units'
 import type { VerifyResult } from '../lib/types'
 import { useStore } from '../store'
 
