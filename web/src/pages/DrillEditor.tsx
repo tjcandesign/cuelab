@@ -550,7 +550,7 @@ function EditorSidebar({
           {selTarget.radii.map((r, ri) => (
             <div key={ri} className="flex gap8 aic mb8">
               <span className="microlabel" style={{ width: 90 }}>
-                r {r} mm
+                r {fmtLen(r, units, 1)}
               </span>
               <input
                 className="field"
