@@ -38,6 +38,7 @@ export default function DrillEditor() {
   const navigate = useNavigate()
   const isNew = id === 'new'
   const config = useStore((s) => s.config)
+  const units = useStore((s) => s.units)
   const [drill, setDrill] = useState<Drill | null>(null)
   const [sel, setSel] = useState<Sel>(null)
   const [placingTarget, setPlacingTarget] = useState(false)
