@@ -103,7 +103,7 @@ export default function Hardware() {
         return { state: 'red', title: "This setup won't work", details: parts }
       }
       const caveats: string[] = []
-      if (proj.pxPerMm < 1.2) caveats.push(`resolution is marginal: ${fmtDensity(proj.pxPerMm, units)} — fine lines will look soft`)
+      if (proj.pxPerMm < 0.5) caveats.push(`resolution is marginal: ${fmtDensity(proj.pxPerMm, units)} — fine lines will look soft`)
       if (proj.lux < 350) caveats.push(`brightness is low: ~${Math.round(proj.lux)} lux on the table — dim the room lights`)
       if (throwRatio <= 0.45 || throwRatio >= 2.4) caveats.push('throw ratio is at the edge of the slider range — double-check the projector spec')
       if (caveats.length > 0) return { state: 'amber', title: 'Will work with caveats', details: caveats }
