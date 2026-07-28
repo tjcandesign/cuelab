@@ -1,11 +1,14 @@
 // /play — control screen / TV scoreboard. Live table canvas on the left,
 // phase-aware game panel on the right. Actions via REST; state via WS pushes.
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import LiveTable from '../components/LiveTable'
+import VoiceBanner from '../components/VoiceBanner'
 import { api } from '../lib/api'
 import { initialsOf, PLAYER_COLORS } from '../lib/colors'
-import type { Drill, GamePlayer, GameSnapshot, Player } from '../lib/types'
+import { setVoiceActive, voiceSupported } from '../lib/voice'
+import type { Drill, GamePlayer, GameSnapshot, InstantRecallExtra, Player } from '../lib/types'
 import { useStore } from '../store'
 
 export default function Play() {
