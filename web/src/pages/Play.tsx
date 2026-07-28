@@ -212,6 +212,7 @@ function SessionSetup() {
 
 function Scoreboard({ game }: { game: GameSnapshot }) {
   const players = game.players ?? []
+  const navigate = useNavigate()
   const [showRescore, setShowRescore] = useState(false)
   const [confirmEnd, setConfirmEnd] = useState(false)
 
