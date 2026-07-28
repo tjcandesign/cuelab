@@ -461,76 +461,20 @@ function RescoreForm({
 
 /* ---------------- voice control ---------------- */
 
-interface VoiceHit {
-  heard: string
-  action: string
-}
-
 function VoiceControl() {
-  const supported = typeof window !== 'undefined' && !!window.webkitSpeechRecognition
-  const [on, setOn] = useState(false)
-  const [hit, setHit] = useState<VoiceHit | null>(null)
-  const recRef = useRef<CueLabSpeechRecognition | null>(null)
-  const onRef = useRef(false)
-
-  useEffect(() => {
-    onRef.current = on
-    if (!supported) return
-    if (on && !recRef.current) {
-      const Ctor = window.webkitSpeechRecognition
-      if (!Ctor) return
-      const rec = new Ctor()
-      rec.continuous = true
-      rec.interimResults = false
-      rec.lang = 'en-US'
-      rec.onresult = (ev) => {
-        for (let i = ev.resultIndex; i < ev.results.length; i++) {
-          const res = ev.results[i]
-          if (!res || !res.isFinal) continue
-          const text = res[0]?.transcript ?? ''
-          if (text.trim()) handlePhrase(text.trim(), setHit)
-        }
-      }
-      rec.onend = () => {
-        recRef.current = null
-        if (onRef.current) {
-          // restart — continuous recognition times out on some platforms
-          setOn(false)
-          setTimeout(() => setOn(true), 100)
-        }
-      }
-      rec.onerror = () => undefined
-      try {
-        rec.start()
-        recRef.current = rec
-      } catch {
-        recRef.current = null
-      }
-    } else if (!on && recRef.current) {
-      try {
-        recRef.current.stop()
-      } catch {
-        // ignore
-      }
-      recRef.current = null
-    }
-    return () => {
-      if (recRef.current) {
-        try {
-          recRef.current.abort()
-        } catch {
-          // ignore
-        }
-        recRef.current = null
-      }
-    }
-  }, [on, supported])
+  const supported = voiceSupported()
+  const on = useStore((s) => s.voiceOn)
+  const hit = useStore((s) => s.voiceAction)
 
   return (
     <div className="card mt16">
       <div className="flex jcb aic">
         <div className="mic-chip">
-          <button className={`btn small${on ? ' primary' : ''}`} disabled={!supported} onClick={() => setOn((v) => !v)}>
+          <button
+            className={`btn small${on ? ' primary' : ''}`}
+            disabled={!supported}
+            onClick={() => setVoiceActive(!on)}
+          >
             {on ? 'Mic on' : 'Mic off'}
           </button>
           {!supported && <span>Voice control needs Chrome (webkitSpeechRecognition unavailable)</span>}
@@ -545,34 +489,4 @@ function VoiceControl() {
       </div>
     </div>
   )
-}
-
-function handlePhrase(text: string, setHit: (h: VoiceHit) => void) {
-  const t = text.toLowerCase()
-  const game = useStore.getState().game
-  const trigger = (action: string, fn: () => Promise<unknown>) => {
-    setHit({ heard: text, action })
-    void fn().catch(() => undefined)
-  }
-  if (t.includes('lock layout')) {
-    if (game) trigger('lock_layout', () => api.sessionAction(game.sessionId, 'lock_layout'))
-    else setHit({ heard: text, action: 'no active session' })
-  } else if (t.includes('new ball') || t.includes('reset balls')) {
-    trigger('sim reset', () => api.simReset())
-  } else if (t.includes('start recording')) {
-    trigger('recording start', () => api.recordingStart())
-  } else if (t.includes('stop recording')) {
-    trigger('recording stop', () => api.recordingStop())
-  } else if (t.includes('end game')) {
-    if (game) {
-      trigger('end session', () =>
-        api.sessionAction(game.sessionId, 'end').then(() => useStore.getState().setGame(null)),
-      )
-    } else setHit({ heard: text, action: 'no active session' })
-  } else if (t.includes('next')) {
-    if (game) trigger('next', () => api.sessionAction(game.sessionId, 'next'))
-    else setHit({ heard: text, action: 'no active session' })
-  } else {
-    setHit({ heard: text, action: 'ignored' })
-  }
 }
