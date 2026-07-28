@@ -34,6 +34,7 @@ export default function Play() {
         <VoiceControl />
       </div>
       <div>{game ? <Scoreboard game={game} /> : <SessionSetup />}</div>
+      <VoiceBanner />
     </div>
   )
 }
