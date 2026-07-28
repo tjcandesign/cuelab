@@ -96,18 +96,31 @@ function RecentSessions({ sessions }: { sessions?: RecentSession[] }) {
   }
   return (
     <div>
-      {sessions.map((s, i) => (
-        <div key={s.id ?? s.sessionId ?? i} className="kv">
-          <span>
-            {String(s.mode ?? 'session').replace('_', ' ')}
-            <span className="muted"> · {fmtDate(s.started_at ?? s.startedAt)}</span>
-          </span>
-          <span className="v">
-            {s.score !== undefined ? `${s.score} pts` : ''}
-            {s.shots !== undefined ? ` · ${s.shots} shots` : ''}
-          </span>
-        </div>
-      ))}
+      {sessions.map((s, i) => {
+        const sid = s.id ?? s.sessionId
+        const row = (
+          <>
+            <span>
+              {String(s.mode ?? 'session').replace('_', ' ')}
+              <span className="muted"> · {fmtDate(s.started_at ?? s.startedAt)}</span>
+            </span>
+            <span className="v">
+              {s.score !== undefined ? `${s.score} pts` : ''}
+              {s.shots !== undefined ? ` · ${s.shots} shots` : ''}
+              {sid !== undefined && <span className="muted"> · analysis →</span>}
+            </span>
+          </>
+        )
+        return sid !== undefined ? (
+          <Link key={`${sid}-${i}`} to={`/sessions/${sid}/analysis`} className="kv kv-link">
+            {row}
+          </Link>
+        ) : (
+          <div key={i} className="kv">
+            {row}
+          </div>
+        )
+      })}
     </div>
   )
 }
