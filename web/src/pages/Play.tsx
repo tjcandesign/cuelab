@@ -335,6 +335,80 @@ function Scoreboard({ game }: { game: GameSnapshot }) {
   )
 }
 
+/* ---------------- instant recall ---------------- */
+
+function InstantRecallPanel({
+  game,
+  act,
+}: {
+  game: GameSnapshot
+  act: (action: string, params?: Record<string, unknown>) => Promise<void> | void
+}) {
+  const extra = (game.extra ?? {}) as InstantRecallExtra
+  const phase = game.phase ?? ''
+  const ballCount = extra.ballCount ?? 0
+  const currentRun = extra.currentRun ?? 0
+  const bestRun = extra.bestRun ?? 0
+  const attempts = extra.attempts ?? 0
+
+  return (
+    <div className="mt16">
+      <div className="ir-tiles">
+        <div className="ir-tile">
+          <div className="microlabel">current run</div>
+          <div className="num">
+            {currentRun}
+            {ballCount > 0 && <span className="of"> / {ballCount}</span>}
+          </div>
+        </div>
+        <div className="ir-tile">
+          <div className="microlabel">best run</div>
+          <div className="num">{bestRun}</div>
+        </div>
+        <div className="ir-tile">
+          <div className="microlabel">attempts</div>
+          <div className="num">{attempts}</div>
+        </div>
+      </div>
+
+      {phase === 'capturing' && (
+        <>
+          <div className="phase-line mt16">
+            Place any layout on the table (2+ balls), then capture it as your reference.
+          </div>
+          <button className="btn primary w100 mt16" onClick={() => void act('capture')}>
+            Capture Layout
+          </button>
+        </>
+      )}
+
+      {phase === 'running' && (
+        <div className="phase-line mt16">
+          Clear the table in any order — a settled shot with nothing pocketed is a miss.
+        </div>
+      )}
+
+      {phase === 'restoring' && (
+        <div className="phase-line mt16">
+          Miss — place the balls back on the projected guides. The run restarts once the layout
+          matches.
+        </div>
+      )}
+
+      {(phase === 'cleared' || extra.cleared) && (
+        <>
+          <div className="banner ok mt16" style={{ textAlign: 'center', fontWeight: 700 }}>
+            TABLE CLEARED — run of {bestRun || ballCount}
+          </div>
+          <button className="btn primary w100 mt16" onClick={() => void act('reset_layout')}>
+            New layout
+          </button>
+        </>
+      )}
+    </div>
+  )
+}
+
 function PlayerRow({ p, current, setter }: { p: GamePlayer; current: boolean; setter: boolean }) {
   return (
     <div className={`playercard${current ? ' current' : ''}`}>
