@@ -4,7 +4,7 @@ CueLab turns a real pool table into an interactive surface. A projector mounted 
 
 ## How it works
 
-A Python server (FastAPI) owns the engine: a 2D physics simulation and a computer-vision pipeline that both produce the same ball-state stream, plus game logic (target pool, 9-ball, drills), and SQLite persistence for players, drills, sessions, and every attempt. A web app (Vite + React) renders three surfaces off that one server: the projector output, the control/TV screen, and management pages for the drill editor, player stats, the calibration wizard, and a hardware planner. The two talk over REST and a WebSocket that streams ball positions at ~30 Hz while anything moves.
+A Python server (FastAPI) owns the engine: a 2D physics simulation and a computer-vision pipeline that both produce the same ball-state stream, plus game logic (target pool, 9-ball, Instant Recall, drills), and SQLite persistence for players, drills, sessions, and every attempt. The server also segments every shot and measures it — cue speed, first object-ball contact, rail contacts, ball paths — so a session can be replayed shot by shot on its analysis page afterward. A web app (Vite + React) renders three surfaces off that one server: the projector output, the control/TV screen, and management pages for the games hub, drill editor, player stats, session analysis, the calibration wizard, and a hardware planner. The two talk over REST and a WebSocket that streams ball positions at ~30 Hz while anything moves.
 
 All geometry lives in table space: millimeters, origin at the top-left corner of the playing surface. Camera and projector each get calibrated to that space with a homography, so drills and games never care which mode they run in.
 
