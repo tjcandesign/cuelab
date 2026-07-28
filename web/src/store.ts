@@ -8,6 +8,7 @@ import type {
   EventMsg,
   GameSnapshot,
   SceneItem,
+  VoiceTranscript,
   WsStatus,
 } from './lib/types'
 
