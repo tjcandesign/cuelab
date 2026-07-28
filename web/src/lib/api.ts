@@ -71,6 +71,9 @@ export const api = {
   getSession: (id: number | string) => get<GameSnapshot>(`/sessions/${id}`),
   sessionAction: (id: number | string, action: string, params?: Record<string, unknown>) =>
     post<GameSnapshot>(`/sessions/${id}/action`, { action, ...(params ?? {}) }),
+  sessionShots: (id: number | string) => get<ShotSummary[]>(`/sessions/${id}/shots`),
+  getShot: (id: number | string) => get<ShotDetail>(`/shots/${id}`),
+  gamesOverview: () => get<GamesOverview>('/games/overview'),
 
   simReset: (balls?: { id: string; x: number; y: number }[]) =>
     post<unknown>('/sim/reset', balls ? { balls } : {}),
