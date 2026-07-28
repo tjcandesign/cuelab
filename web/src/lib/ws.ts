@@ -33,6 +33,16 @@ function dispatch(msg: unknown): void {
       store.setScene(Array.isArray(m.items) ? (m.items as SceneItem[]) : [])
       break
     }
+    case 'shot_recorded': {
+      // Some server builds send shot_recorded as a top-level message rather
+      // than an event frame — normalize to an EventMsg either way.
+      store.setLastEvent({
+        type: 'event',
+        event: 'shot_recorded',
+        data: { shotId: m.shotId, sessionId: m.sessionId, metrics: m.metrics },
+      })
+      break
+    }
     default:
       break
   }
