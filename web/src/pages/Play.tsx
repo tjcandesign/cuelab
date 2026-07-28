@@ -69,8 +69,11 @@ function SessionSetup() {
     api.listDrills().then((d) => setDrills(Array.isArray(d) ? d : [])).catch(() => undefined)
   }, [])
 
+  const single = mode === 'instant_recall' // single player mode
   const toggle = (id: number) =>
-    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
+    setSelected((s) =>
+      s.includes(id) ? s.filter((x) => x !== id) : single ? [id] : [...s, id],
+    )
 
   const addPlayer = async () => {
     const name = newName.trim()
