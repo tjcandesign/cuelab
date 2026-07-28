@@ -25,6 +25,7 @@ export default function TableView() {
         </div>
       </div>
       {game?.message && <div className="phase-line mt16">{game.message}</div>}
+      <VoiceBanner />
     </div>
   )
 }
