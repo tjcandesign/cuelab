@@ -168,6 +168,11 @@ class GameManager:
                 await self.active.on_event(etype, data)
             except Exception:
                 log.exception("game on_event failed")
+        # after the mode, so its shot judgment feeds the `made` metric
+        try:
+            await self.shots.on_event(etype, data)
+        except Exception:
+            log.exception("shot tracker on_event failed")
 
     async def on_state(self, balls: list[Ball]) -> None:
         if self.active is not None and not self.active.ended:
@@ -175,6 +180,7 @@ class GameManager:
                 await self.active.on_state(balls)
             except Exception:
                 log.exception("game on_state failed")
+        self.shots.on_state(balls)
 
     async def emit_ws_event(self, etype: str, data: dict[str, Any]) -> None:
         self.db.log_event(etype, data)
