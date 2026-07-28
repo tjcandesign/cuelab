@@ -267,6 +267,7 @@ class TargetPoolMode(BaseMode):
         player = self.player(shooter_id)
         if player is not None:
             player["shots"] += 1
+        self.last_shot_made = pocketed_ok and not scratch
         self.record_attempt(shooter_id, points, pocketed_ok, scratch, ring)
         self.last_result = {
             "playerId": shooter_id,
