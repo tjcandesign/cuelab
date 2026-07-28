@@ -547,7 +547,7 @@ with TestClient(app) as client:
           and "ANTHROPIC_API_KEY" in r.json()["error"], r.text)
 
     # ------------------------------------------------- config + camera mode
-    print("[11] config merge + camera-mode boot without hardware")
+    print("[13] config merge + camera-mode boot without hardware")
     r = client.put("/api/config", json={"tableSize": "9ft"})
     check("PUT /api/config resolves preset",
           r.json()["tableL"] == 2540.0 and r.json()["tableW"] == 1270.0, r.text)
