@@ -249,6 +249,8 @@ function Scoreboard({ game }: { game: GameSnapshot }) {
           ))}
         </div>
 
+        {game.mode === 'instant_recall' && <InstantRecallPanel game={game} act={act} />}
+
         {game.message && <div className="phase-line mt16">{game.message}</div>}
 
         {typeof game.countdown === 'number' && game.countdown > 0 && (
