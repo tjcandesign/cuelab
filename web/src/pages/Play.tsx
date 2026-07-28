@@ -146,17 +146,29 @@ function SessionSetup() {
         </div>
       )}
 
-      <div className="formrow">
-        <span className="microlabel">Rounds</span>
-        <div className="stepper">
-          <button onClick={() => setRounds((r) => Math.max(1, r - 1))}>−</button>
-          <span className="val">{rounds}</span>
-          <button onClick={() => setRounds((r) => Math.min(30, r + 1))}>+</button>
+      {mode !== 'instant_recall' && (
+        <div className="formrow">
+          <span className="microlabel">Rounds</span>
+          <div className="stepper">
+            <button onClick={() => setRounds((r) => Math.max(1, r - 1))}>−</button>
+            <span className="val">{rounds}</span>
+            <button onClick={() => setRounds((r) => Math.min(30, r + 1))}>+</button>
+          </div>
         </div>
-      </div>
+      )}
+
+      {mode === 'instant_recall' && (
+        <div className="formrow">
+          <span className="microlabel">Goal</span>
+          <div className="muted" style={{ fontSize: 13 }}>
+            Single player. Capture one layout, then keep returning to it until you can clear the
+            table without a miss.
+          </div>
+        </div>
+      )}
 
       <div className="formrow">
-        <span className="microlabel">Players</span>
+        <span className="microlabel">{single ? 'Player' : 'Players'}</span>
         <div className="flex gap8" style={{ flexWrap: 'wrap' }}>
           {players.map((p) => (
             <button key={p.id} className={`chip${selected.includes(p.id) ? ' on' : ''}`} onClick={() => toggle(p.id)}>
