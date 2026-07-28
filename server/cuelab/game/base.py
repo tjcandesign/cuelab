@@ -44,6 +44,9 @@ class BaseMode:
         self.last_result: dict[str, Any] | None = None
         self.countdown: int | None = None
         self.ended = False
+        # judgment for the most recent shot (set by modes that can tell,
+        # consumed by the shot tracker for the `made` metric)
+        self.last_shot_made: bool | None = None
 
     # ------------------------------------------------------------ lifecycle
 
