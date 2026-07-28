@@ -276,12 +276,25 @@ function Scoreboard({ game }: { game: GameSnapshot }) {
           {phase === 'call_pocket' && (
             <span className="chip static">Click a pocket on the table to call it</span>
           )}
+          {(game.mode === 'drill' || game.mode === 'instant_recall') && (
+            <>
+              <button className="btn" onClick={() => void act('mark', { success: true })}>
+                Mark made
+              </button>
+              <button className="btn" onClick={() => void act('mark', { success: false })}>
+                Mark missed
+              </button>
+            </>
+          )}
           <button className="btn" onClick={() => void act('next')}>
             Next
           </button>
           <button className="btn" onClick={() => setShowRescore((v) => !v)}>
             Rescore
           </button>
+          <Link className="btn" to={`/sessions/${game.sessionId}/analysis`}>
+            Analysis
+          </Link>
           {!confirmEnd ? (
             <button className="btn danger" onClick={() => setConfirmEnd(true)}>
               End session
