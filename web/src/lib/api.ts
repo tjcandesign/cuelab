@@ -6,8 +6,11 @@ import type {
   Config,
   Drill,
   GameSnapshot,
+  GamesOverview,
   Player,
   PlayerStats,
+  ShotDetail,
+  ShotSummary,
   VerifyResult,
 } from './types'
 
