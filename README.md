@@ -29,9 +29,12 @@ Open http://localhost:5173. Sim mode is the default, so the whole system works w
 | Built today | Roadmap |
 |---|---|
 | Sim physics table with synthetic camera | Custom-trained ball detector (see [docs/TRAINING.md](docs/TRAINING.md)) |
-| Target pool (the FusionCue flagship game) | Drill publishing / community sharing |
-| 9-ball basics | Real-time online multiplayer |
-| Drill practice + drill editor | Auto-updates |
+| Target pool (the FusionCue flagship game) | Auto-updates |
+| 9-ball basics | |
+| Instant Recall (memorize a layout, clear it, restore it on a miss) | |
+| Drill practice + drill editor | |
+| Per-shot analysis: recorded ball paths + metrics, replayable per session | |
+| Games hub with stats and layout maps | |
 | Player profiles and stats | |
 | Camera calibration flow (works on synthetic camera) | |
 | Projector keystone calibration | |
