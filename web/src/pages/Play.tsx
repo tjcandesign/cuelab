@@ -111,7 +111,11 @@ function SessionSetup() {
     }
   }
 
-  const canStart = !busy && (mode === 'free' || selected.length > 0) && (mode !== 'drill' || drillId !== '')
+  const canStart =
+    !busy &&
+    (mode === 'free' || selected.length > 0) &&
+    (mode !== 'drill' || drillId !== '') &&
+    (!single || selected.length === 1)
 
   return (
     <div className="card">
