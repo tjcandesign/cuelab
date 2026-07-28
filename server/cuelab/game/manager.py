@@ -16,7 +16,9 @@ from ..hub import Hub
 from .base import ActionError, BaseMode
 from .drill import DrillMode
 from .free import FreeMode
+from .instant_recall import InstantRecallMode
 from .nine_ball import NineBallMode
+from .shots import ShotTracker
 from .target_pool import TargetPoolMode
 
 log = logging.getLogger("cuelab.game")
@@ -26,6 +28,7 @@ MODE_CLASSES: dict[str, type[BaseMode]] = {
     "nine_ball": NineBallMode,
     "drill": DrillMode,
     "free": FreeMode,
+    "instant_recall": InstantRecallMode,
 }
 
 
