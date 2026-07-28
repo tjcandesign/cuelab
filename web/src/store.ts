@@ -23,7 +23,13 @@ interface CueLabStore {
   calibration: Calibration | null
   lastEvent: EventMsg | null
   units: Units
+  voiceOn: boolean
+  voiceTranscript: VoiceTranscript | null
+  voiceAction: { heard: string; action: string } | null
 
+  setVoiceOn: (on: boolean) => void
+  setVoiceTranscript: (t: VoiceTranscript | null) => void
+  setVoiceAction: (a: { heard: string; action: string } | null) => void
   setUnits: (u: Units) => void
   setWsStatus: (s: WsStatus) => void
   setLiveState: (balls: Ball[], moving: boolean, ts: number) => void
