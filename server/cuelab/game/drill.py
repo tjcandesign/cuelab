@@ -150,6 +150,7 @@ class DrillMode(BaseMode):
         player = self.player(shooter_id)
         if player is not None:
             player["shots"] += 1
+        self.last_shot_made = success
         self._last_attempt_id = self.record_attempt(
             shooter_id, points, bool(pocketed_list), scratch, None
         )
