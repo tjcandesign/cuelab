@@ -104,6 +104,65 @@ Colors: token `"accent"|"white"|"dim"|"success"|"danger"` or `#hex`.
 
 `players(id,name,initials,color,created_at,last_active)` · `drills(id,name,type,published,json,created_at,updated_at)` · `sessions(id,mode,drill_id,rounds,started_at,ended_at,summary_json)` · `session_players(session_id,player_id,score,shots)` · `attempts(id,session_id,player_id,round,points,pocketed,scratch,ring,created_at)` · `events(id,ts,type,json)`
 
+## FusionCue-parity extensions (v2)
+
+Local-first equivalents of FusionCue's remaining features. Same ownership rules: server agent implements server side, web agent the UI.
+
+### Shot metrics + analysis
+
+Server segments every shot (existing `shot_start`/`shot_end` events) and computes metrics from the frame history between them:
+
+- `cueSpeedMph` — peak cue-ball speed within 400 ms after `shot_start`, mm/s → mph (÷ 447.04).
+- `firstContact` — id of first object ball whose distance to cue ≤ 2r+6 mm, else `null`.
+- `objectTravelPct` — summed path length of all non-cue balls ÷ table length L × 100, 1 decimal.
+- `railContacts` — count of cue-ball rail reflections (velocity sign flip within 40 mm of a rail).
+- `pocketed` — list of `{ballId, pocket}` during the shot; `scratch` bool.
+- `made` — bool|null, filled by the active game mode's judgment when available (drill/target_pool/instant_recall), else null.
+- `trackedFrames` — frame count; `paths` — per-ball downsampled polylines `[{id, pts:[[x,y],...]}]` (≤120 pts/ball).
+
+New table `shots(id, session_id, player_id, round, ts_start, ts_end, metrics_json, paths_json)`. Persist every shot that occurs while a session is active. WS event `shot_recorded` with `{shotId, sessionId, metrics}` (no paths).
+
+REST: `GET /sessions/{id}/shots` → `[{id, playerId, round, tsStart, tsEnd, metrics}]`; `GET /shots/{id}` → full record incl. `paths`.
+
+Web: Analysis page `/sessions/:id/analysis` — FusionCue-style: shot timeline strip (round/shot chips, green dot made / red missed), selected shot renders both recorded paths on the table view with a metrics panel (MADE/MISSED, target, first contact, object travel %, cue speed mph, rail contact, pocketed).
+
+### Instant Recall (game mode `instant_recall`)
+
+Single player. Phases:
+
+`capturing` (place balls freely; `POST action {action:"capture"}` locks the current settled layout — every ball on table — as the reference; requires ≥2 balls) → `running` (clear the table in any order; each `ball_pocketed` +1 to current run; `balls_settled` with no pocket and no scratch = miss) → on miss/scratch: `restoring` (scene shows ghost drop spots for every non-pocketed reference ball; when all balls are back within 25 mm of reference → `layout_matched` → auto back to `running`, current run resets to the count already pocketed stays — no: current run resets to 0 and ALL reference balls must be restored, i.e. re-place pocketed balls too) → table cleared: `cleared` (session best run = ball count; message + projected celebration) → `capturing` for a new layout or `end`.
+
+Snapshot `extra`: `{"ballCount":N,"currentRun":n,"bestRun":n,"attempts":n,"cleared":bool}`. Actions: `capture`, `mark {success}` (manual override), `reset_layout` (back to `capturing`), `next` (force-advance), `end`.
+
+Persist per-session summary; `attempts` rows: one per run attempt, `points` = run length.
+
+### Games overview
+
+`GET /games/overview` → `{"gamesPlayed":N,"targetPoolHigh":N,"instantRecallBest":N,"lastSession":{"id","mode","score","endedAt"}|null}` (from sessions/attempts).
+
+Web: Games page — stat tiles + a card per game (Instant Recall, Target Pool) with description, personal best, My Stats, Launch Game; below, **Layout maps**: grid of published drills of type `target_pool_layout|position` rendered as mini table maps (dashed numbered circles).
+
+### Community (local)
+
+New table `posts(id, player_id, text, session_id NULL, drill_id NULL, created_at)`.
+
+- `GET|POST /posts` (POST body `{playerId, text, sessionId?, drillId?}`) → post rows joined with player name/initials/color.
+- `GET /activity?limit=30` → merged feed, newest first: drill published/updated, session completed (with mode+score), post created, player created. Shape: `[{ts, type:"drill_published|session_completed|post|player_joined", playerName, text, refId}]`.
+
+Web: Dashboard becomes the home route `/` — three columns like FusionCue: community feed (posts + composer, session/drill attachments render as cards with a "View session analysis" link), Latest Drills (cards: name, tags, difficulty chip, players, Add to my drills = duplicate), Activity list + online players.
+
+### Presence + invites (LAN)
+
+WS `hello` gains optional `playerId`. Server keeps in-memory presence `{playerId: connCount}`; `GET /presence` → `[{playerId, name, initials, color, online:true}]` (players with ≥1 conn). Broadcast WS `{"type":"presence","online":[playerIds]}` on change.
+
+In-memory invites: `POST /invites {fromPlayerId, toPlayerId, mode:"drill|target_pool|instant_recall", drillId?, rounds}` → id; WS broadcast `{"type":"invite","invite":{id,from:{...},to:{...},mode,drillName,rounds,status:"pending"}}`. `POST /invites/{id}/accept` → creates the session (both players), broadcasts updated invite + `game` snapshot. `POST /invites/{id}/decline`. Invites expire after 120 s.
+
+Web: online players list shows Invite buttons opening a FusionCue-style modal (game type, drill search, rounds 3/5/7/9/15); incoming invite = toast on every surface with Accept/Decline.
+
+### Voice transcript banner
+
+Web-only: while voice commands are active, show a live STT banner (mic icon + interim/final transcript, fades after 3 s) on Play and TableView, styled like FusionCue's.
+
 ## Visual language (web)
 
 Dark, quiet, precise. Tokens: bg `#0b0b10`, panel `#15151c`, border `#26262f`, text `#e8e8ef`, dim `#8b8b98`, accent `#8b5cf6`, success `#34d399`, danger `#f87171`, cloth render `#2273c9`. System/Inter type; uppercase mono micro-labels (11px, letter-spacing 0.12em) for card headers. 1px borders, 10–14px radii, no shadows-as-decoration, **no left-border accent callout boxes**. Projector page: pure black background (black projects as nothing), thick high-contrast strokes (≥4 mm at table scale).
