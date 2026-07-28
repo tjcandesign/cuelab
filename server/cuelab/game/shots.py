@@ -31,21 +31,18 @@ MAX_FRAMES = 4000  # hard cap on the frame buffer
 Frame = tuple[float, dict[str, tuple[float, float, float, float]]]
 
 
-def _min_pair_distance(
+def _segment_point_distance(
     a0: tuple[float, float],
     a1: tuple[float, float],
-    b0: tuple[float, float],
-    b1: tuple[float, float],
+    p: tuple[float, float],
 ) -> float:
-    """Closest approach of two points moving linearly over one interval."""
-    dx, dy = a0[0] - b0[0], a0[1] - b0[1]
-    dvx = (a1[0] - a0[0]) - (b1[0] - b0[0])
-    dvy = (a1[1] - a0[1]) - (b1[1] - b0[1])
-    dv2 = dvx * dvx + dvy * dvy
-    if dv2 < 1e-9:
-        return math.hypot(dx, dy)
-    t = min(max(-(dx * dvx + dy * dvy) / dv2, 0.0), 1.0)
-    return math.hypot(dx + t * dvx, dy + t * dvy)
+    """Closest approach of segment a0->a1 to the static point p."""
+    dx, dy = a1[0] - a0[0], a1[1] - a0[1]
+    seg2 = dx * dx + dy * dy
+    if seg2 < 1e-9:
+        return math.hypot(a0[0] - p[0], a0[1] - p[1])
+    t = min(max(((p[0] - a0[0]) * dx + (p[1] - a0[1]) * dy) / seg2, 0.0), 1.0)
+    return math.hypot(a0[0] + t * dx - p[0], a0[1] + t * dy - p[1])
 
 
 class ShotTracker:
