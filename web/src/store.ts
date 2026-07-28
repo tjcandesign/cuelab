@@ -54,7 +54,13 @@ export const useStore = create<CueLabStore>((set) => ({
   calibration: null,
   lastEvent: null,
   units: loadUnits(),
+  voiceOn: false,
+  voiceTranscript: null,
+  voiceAction: null,
 
+  setVoiceOn: (voiceOn) => set({ voiceOn }),
+  setVoiceTranscript: (voiceTranscript) => set({ voiceTranscript }),
+  setVoiceAction: (voiceAction) => set({ voiceAction }),
   setUnits: (units) => {
     localStorage.setItem(UNITS_KEY, units)
     set({ units })
