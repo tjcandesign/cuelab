@@ -1,6 +1,7 @@
 // /table — spectator view: the live table full-width, read-only.
 
 import LiveTable from '../components/LiveTable'
+import VoiceBanner from '../components/VoiceBanner'
 import { useStore } from '../store'
 
 export default function TableView() {
