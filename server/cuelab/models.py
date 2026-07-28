@@ -30,7 +30,7 @@ class PlayerPatch(BaseModel):
 
 
 class SessionCreate(BaseModel):
-    mode: Literal["target_pool", "nine_ball", "drill", "free"]
+    mode: Literal["target_pool", "nine_ball", "drill", "free", "instant_recall"]
     playerIds: list[int] = Field(default_factory=list)
     rounds: int = 10
     drillId: int | None = None
