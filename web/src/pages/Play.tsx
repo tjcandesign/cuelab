@@ -98,7 +98,7 @@ function SessionSetup() {
     try {
       const body: { mode: string; playerIds: number[]; rounds: number; drillId?: number } = {
         mode,
-        playerIds: selected,
+        playerIds: single ? selected.slice(0, 1) : selected,
         rounds,
       }
       if (mode === 'drill' && drillId !== '') body.drillId = Number(drillId)
