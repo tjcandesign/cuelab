@@ -421,8 +421,112 @@ with TestClient(app) as client:
     check("free mode accumulates stats", s["extra"]["shots"] >= 1, str(s["extra"]))
     client.post(f"/api/sessions/{fsid}/action", json={"action": "end"})
 
+    # ----------------------------------------- instant recall + shot metrics
+    print("[9] instant_recall + shot metrics")
+    r = client.post("/api/sessions", json={
+        "mode": "instant_recall", "playerIds": [p1["id"]], "rounds": 1})
+    isnap = r.json()
+    isid = isnap["sessionId"]
+    check("instant_recall starts capturing",
+          r.status_code == 201 and isnap["phase"] == "capturing"
+          and isnap["extra"]["ballCount"] == 0, r.text)
+    r = client.post("/api/sessions", json={
+        "mode": "instant_recall", "playerIds": [p1["id"], p2["id"]], "rounds": 1})
+    check("instant_recall rejects 2 players", r.status_code == 409, r.text)
+
+    IR_LAYOUT = [{"id": "cue", "x": 1117.6, "y": 300},
+                 {"id": "b1", "x": 1117.6, "y": 700},
+                 {"id": "b2", "x": 600, "y": 300}]
+    client.post("/api/sim/reset", json={"balls": IR_LAYOUT})
+    s = client.post(f"/api/sessions/{isid}/action", json={"action": "capture"}).json()
+    check("capture locks layout -> running",
+          s["phase"] == "running" and s["extra"]["ballCount"] == 2
+          and len(s["layout"]) == 3, str(s))
+
+    def wait_ir(cond, timeout: float = 20.0) -> dict:
+        t0 = time.time()
+        while time.time() - t0 < timeout:
+            s = client.get(f"/api/sessions/{isid}").json()
+            if cond(s):
+                return s
+            time.sleep(0.05)
+        raise AssertionError(f"timeout, at {client.get(f'/api/sessions/{isid}').json()}")
+
+    def wait_shots(n: int, timeout: float = 20.0) -> list[dict]:
+        t0 = time.time()
+        while time.time() - t0 < timeout:
+            shots = client.get(f"/api/sessions/{isid}/shots").json()
+            if len(shots) >= n:
+                return shots
+            time.sleep(0.05)
+        raise AssertionError(f"timeout waiting for {n} shots")
+
+    # shot 1: cue drives b1 into the bottom-side pocket -> run of 1
+    client.post("/api/sim/shoot", json={"ballId": "cue", "angle": 90, "speed": 1500})
+    shots = wait_shots(1)
+    s = wait_ir(lambda s: s["extra"]["currentRun"] >= 1 and s["phase"] == "running")
+    check("pocket during run -> currentRun=1, still running",
+          s["extra"]["currentRun"] == 1 and not s["extra"]["cleared"], str(s["extra"]))
+    m = shots[0]["metrics"]
+    check("shot metrics: plausible cue speed",
+          2.0 < m["cueSpeedMph"] < 4.5, str(m))
+    check("shot metrics: first contact is b1", m["firstContact"] == "b1", str(m))
+    check("shot metrics: pocketed + made + frames",
+          m["pocketed"] == [{"ballId": "b1", "pocket": "bs"}]
+          and m["scratch"] is False and m["made"] is True
+          and m["trackedFrames"] >= 1 and m["objectTravelPct"] >= 0
+          and m["railContacts"] >= 0, str(m))
+    full = client.get(f"/api/shots/{shots[0]['id']}").json()
+    check("GET /api/shots/{id} has downsampled paths",
+          full["sessionId"] == isid and any(p["id"] == "cue" for p in full["paths"])
+          and all(2 <= len(p["pts"]) <= 120 for p in full["paths"]
+                  if p["id"] == "cue"), str(full)[:300])
+    check("shot_recorded event logged",
+          db_query("SELECT COUNT(*) FROM events WHERE type='shot_recorded'")[0][0] >= 1,
+          "no shot_recorded events")
+
+    # shot 2: harmless roll, nothing pocketed -> miss -> restoring
+    client.post("/api/sim/shoot", json={"ballId": "cue", "angle": 180, "speed": 400})
+    s = wait_ir(lambda s: s["phase"] == "restoring")
+    check("miss -> restoring, run reset, attempt persisted",
+          s["extra"]["currentRun"] == 0 and s["extra"]["attempts"] == 1, str(s["extra"]))
+    rows = db_query("SELECT points FROM attempts WHERE session_id=? ORDER BY id", (isid,))
+    check("attempt row points = run length", rows[0][0] == 1, str(rows))
+
+    # restore all reference balls (b1 was pocketed: it must come back too)
+    for spec in IR_LAYOUT:
+        client.post("/api/sim/place", json=spec)
+    s = wait_ir(lambda s: s["phase"] == "running")
+    check("layout restored -> auto back to running",
+          s["extra"]["currentRun"] == 0, str(s["extra"]))
+
+    # clear the table: b1 into bs again, then b2 into tl -> cleared
+    client.post("/api/sim/shoot", json={"ballId": "cue", "angle": 90, "speed": 1500})
+    wait_ir(lambda s: s["extra"]["currentRun"] >= 1 and s["phase"] == "running")
+    ang = math.degrees(math.atan2(0 - 300, 0 - 600))
+    client.post("/api/sim/shoot", json={"ballId": "b2", "angle": ang, "speed": 1200})
+    s = wait_ir(lambda s: s["phase"] == "cleared")
+    check("table cleared -> bestRun = ballCount, celebration state",
+          s["extra"]["cleared"] is True and s["extra"]["bestRun"] == 2
+          and s["extra"]["attempts"] == 2, str(s["extra"]))
+    rows = db_query("SELECT points FROM attempts WHERE session_id=? ORDER BY id", (isid,))
+    check("cleared attempt row points = ball count", rows[-1][0] == 2, str(rows))
+    s = client.post(f"/api/sessions/{isid}/action", json={"action": "reset_layout"}).json()
+    check("reset_layout -> capturing keeps bestRun",
+          s["phase"] == "capturing" and s["extra"]["bestRun"] == 2, str(s))
+    client.post(f"/api/sessions/{isid}/action", json={"action": "end"})
+
+    # --------------------------------------------------------- games overview
+    print("[10] games overview")
+    g = client.get("/api/games/overview").json()
+    check("games overview aggregates",
+          g["gamesPlayed"] >= 5 and g["targetPoolHigh"] >= 6
+          and g["instantRecallBest"] == 2 and g["lastSession"] is not None
+          and {"id", "mode", "score", "endedAt"} <= set(g["lastSession"].keys()),
+          str(g))
+
     # ------------------------------------------------------------ recording
-    print("[9] recording")
+    print("[11] recording")
     r = client.post("/api/recording/start")
     check("recording start", r.status_code == 200, r.text)
     time.sleep(1.0)
