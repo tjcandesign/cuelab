@@ -305,7 +305,11 @@ function Scoreboard({ game }: { game: GameSnapshot }) {
                 className="btn danger"
                 onClick={() => {
                   setConfirmEnd(false)
-                  void act('end').then(() => useStore.getState().setGame(null))
+                  const sid = game.sessionId
+                  void act('end').then(() => {
+                    useStore.getState().setGame(null)
+                    navigate(`/sessions/${sid}/analysis`)
+                  })
                 }}
               >
                 Confirm end
