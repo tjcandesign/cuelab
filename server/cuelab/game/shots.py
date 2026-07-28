@@ -158,8 +158,9 @@ class ShotTracker:
         return round(peak / MMS_PER_MPH, 2)
 
     def _first_contact(self, frames: list[Frame]) -> str | None:
-        """First object ball the cue closes to <= 2r+6 mm, interpolating
-        each frame pair (a pocketed ball is held at its last known spot)."""
+        """First object ball the cue closes to <= 2r+6 mm. The cue path is
+        interpolated across each frame pair; the object is held at its
+        interval-start position (it was at rest until first contact)."""
         for i in range(len(frames) - 1):
             _, f0 = frames[i]
             _, f1 = frames[i + 1]
@@ -171,10 +172,8 @@ class ShotTracker:
             for ball_id, o0 in f0.items():
                 if ball_id == "cue":
                     continue
-                o1 = f1.get(ball_id, o0)
-                d = _min_pair_distance(
-                    (cue0[0], cue0[1]), (cue1[0], cue1[1]),
-                    (o0[0], o0[1]), (o1[0], o1[1]),
+                d = _segment_point_distance(
+                    (cue0[0], cue0[1]), (cue1[0], cue1[1]), (o0[0], o0[1])
                 )
                 if d <= best_d:
                     best_id, best_d = ball_id, d
