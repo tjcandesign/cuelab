@@ -53,6 +53,41 @@ def player_stats(db: Database, player_id: int) -> dict[str, Any]:
     }
 
 
+def games_overview(db: Database) -> dict[str, Any]:
+    played = db.query_one("SELECT COUNT(*) AS n FROM sessions")
+    tp_high = db.query_one(
+        "SELECT COALESCE(MAX(sp.score), 0) AS high"
+        " FROM session_players sp JOIN sessions s ON s.id = sp.session_id"
+        " WHERE s.mode = 'target_pool'"
+    )
+    ir_best = db.query_one(
+        "SELECT COALESCE(MAX(a.points), 0) AS best"
+        " FROM attempts a JOIN sessions s ON s.id = a.session_id"
+        " WHERE s.mode = 'instant_recall'"
+    )
+    last = db.query_one(
+        "SELECT s.id, s.mode, s.ended_at,"
+        " (SELECT COALESCE(MAX(score), 0) FROM session_players"
+        "  WHERE session_id = s.id) AS score"
+        " FROM sessions s WHERE s.ended_at IS NOT NULL ORDER BY s.id DESC LIMIT 1"
+    )
+    return {
+        "gamesPlayed": played["n"] if played else 0,
+        "targetPoolHigh": tp_high["high"] if tp_high else 0,
+        "instantRecallBest": ir_best["best"] if ir_best else 0,
+        "lastSession": (
+            {
+                "id": last["id"],
+                "mode": last["mode"],
+                "score": last["score"],
+                "endedAt": last["ended_at"],
+            }
+            if last
+            else None
+        ),
+    }
+
+
 def overview(db: Database) -> dict[str, Any]:
     players = db.query_one("SELECT COUNT(*) AS n FROM players")
     sessions = db.query_one("SELECT COUNT(*) AS n FROM sessions")
