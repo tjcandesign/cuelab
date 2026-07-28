@@ -540,7 +540,7 @@ with TestClient(app) as client:
     check("GET /api/recordings", any(x["file"] == fname for x in lst), str(lst))
 
     # ---------------------------------------------------------------- voice
-    print("[10] voice coach (no key -> 501)")
+    print("[12] voice coach (no key -> 501)")
     r = client.post("/api/voice/chat", json={"text": "how do I draw the ball?"})
     check("voice 501 without ANTHROPIC_API_KEY",
           r.status_code == 501 and r.json()["reply"] is None
