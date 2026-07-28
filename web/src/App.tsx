@@ -37,6 +37,8 @@ export default function App() {
       <Route element={<Shell />}>
         <Route path="/" element={<Navigate to="/play" replace />} />
         <Route path="/play" element={<Play />} />
+        <Route path="/games" element={<Games />} />
+        <Route path="/sessions/:id/analysis" element={<SessionAnalysis />} />
         <Route path="/table" element={<TableView />} />
         <Route path="/drills" element={<Drills />} />
         <Route path="/drills/:id/edit" element={<DrillEditor />} />
