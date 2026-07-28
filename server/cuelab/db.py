@@ -59,6 +59,16 @@ CREATE TABLE IF NOT EXISTS events (
     type TEXT,
     json TEXT
 );
+CREATE TABLE IF NOT EXISTS shots (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id INTEGER NOT NULL,
+    player_id INTEGER,
+    round INTEGER,
+    ts_start INTEGER,
+    ts_end INTEGER,
+    metrics_json TEXT NOT NULL,
+    paths_json TEXT NOT NULL
+);
 """
 
 
