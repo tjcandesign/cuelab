@@ -11,6 +11,7 @@ from . import (
     players,
     recording,
     sessions,
+    shots,
     sim,
     stats,
     system,
