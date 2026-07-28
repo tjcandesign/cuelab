@@ -2,8 +2,9 @@
 
 Exercises: homography solve roundtrip, sim physics (travel, cushion,
 pocket, scratch, collision), a complete 2-player target_pool round driven
-programmatically, drill/nine_ball/free sessions, stats queries, WS,
-recording, calibration + synthetic camera, voice 501.
+programmatically, drill/nine_ball/free sessions, instant_recall + shot
+metrics, games overview, stats queries, WS, recording, calibration +
+synthetic camera, voice 501.
 
 Run: .venv/bin/python selftest.py  (from server/)
 """
