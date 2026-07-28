@@ -95,6 +95,8 @@ class GameManager:
             )
         if mode == "target_pool" and not players:
             raise ActionError("target_pool needs at least one player")
+        if mode == "instant_recall" and len(players) != 1:
+            raise ActionError("instant_recall needs exactly one player")
         drill: dict[str, Any] | None = None
         if mode == "drill":
             if drill_id is None:
