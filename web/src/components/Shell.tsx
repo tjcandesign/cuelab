@@ -3,6 +3,7 @@ import { useStore } from '../store'
 
 const LINKS: { to: string; label: string }[] = [
   { to: '/play', label: 'Play' },
+  { to: '/games', label: 'Games' },
   { to: '/table', label: 'Table view' },
   { to: '/drills', label: 'Drills' },
   { to: '/players', label: 'Players' },
