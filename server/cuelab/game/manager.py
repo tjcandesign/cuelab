@@ -59,6 +59,7 @@ class GameManager:
         self._table_dims = table_dims
         self.timing = timing or Timing.from_env()
         self.active: BaseMode | None = None
+        self.shots = ShotTracker(self)
         self._tasks: set[asyncio.Task] = set()
         self._last_scene_json: str | None = None
 
