@@ -43,13 +43,18 @@ export default function Play() {
 
 const MODES = [
   { id: 'target_pool', label: 'Target Pool' },
+  { id: 'instant_recall', label: 'Instant Recall' },
   { id: 'nine_ball', label: '9-Ball' },
   { id: 'drill', label: 'Drill' },
   { id: 'free', label: 'Free play' },
 ]
 
 function SessionSetup() {
-  const [mode, setMode] = useState('target_pool')
+  const location = useLocation()
+  const requestedMode = (location.state as { mode?: string } | null)?.mode
+  const [mode, setMode] = useState(
+    requestedMode && MODES.some((m) => m.id === requestedMode) ? requestedMode : 'target_pool',
+  )
   const [rounds, setRounds] = useState(5)
   const [players, setPlayers] = useState<Player[]>([])
   const [selected, setSelected] = useState<number[]>([])
