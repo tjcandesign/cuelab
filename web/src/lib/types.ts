@@ -174,5 +174,63 @@ export interface Drill {
   published?: boolean
 }
 
+/* ---- FusionCue-parity extensions (v2) ---- */
+
+export interface ShotPath {
+  id: string
+  pts: [number, number][]
+}
+
+export interface PocketedEntry {
+  ballId?: string
+  pocket?: string
+}
+
+export interface ShotMetrics {
+  cueSpeedMph?: number | null
+  firstContact?: string | null
+  objectTravelPct?: number | null
+  railContacts?: number | null
+  pocketed?: PocketedEntry[] | null
+  scratch?: boolean | null
+  made?: boolean | null
+  trackedFrames?: number | null
+}
+
+export interface ShotSummary {
+  id: number
+  playerId?: number | null
+  round?: number | null
+  tsStart?: number | null
+  tsEnd?: number | null
+  metrics?: ShotMetrics | null
+}
+
+export interface ShotDetail extends ShotSummary {
+  paths?: ShotPath[] | null
+}
+
+export interface GamesOverview {
+  gamesPlayed?: number
+  targetPoolHigh?: number
+  instantRecallBest?: number
+  lastSession?: { id?: number; mode?: string; score?: number; endedAt?: string | null } | null
+}
+
+/** `extra` payload of the instant_recall game snapshot. */
+export interface InstantRecallExtra {
+  ballCount?: number
+  currentRun?: number
+  bestRun?: number
+  attempts?: number
+  cleared?: boolean
+}
+
+export interface VoiceTranscript {
+  text: string
+  final: boolean
+  ts: number
+}
+
 export type WsStatus = 'connecting' | 'open' | 'closed'
 export type WsRole = 'control' | 'projector' | 'viewer'
