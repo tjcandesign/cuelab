@@ -142,22 +142,9 @@ Persist per-session summary; `attempts` rows: one per run attempt, `points` = ru
 
 Web: Games page — stat tiles + a card per game (Instant Recall, Target Pool) with description, personal best, My Stats, Launch Game; below, **Layout maps**: grid of published drills of type `target_pool_layout|position` rendered as mini table maps (dashed numbered circles).
 
-### Community (local)
+### Community / presence / invites — CUT
 
-New table `posts(id, player_id, text, session_id NULL, drill_id NULL, created_at)`.
-
-- `GET|POST /posts` (POST body `{playerId, text, sessionId?, drillId?}`) → post rows joined with player name/initials/color.
-- `GET /activity?limit=30` → merged feed, newest first: drill published/updated, session completed (with mode+score), post created, player created. Shape: `[{ts, type:"drill_published|session_completed|post|player_joined", playerName, text, refId}]`.
-
-Web: Dashboard becomes the home route `/` — three columns like FusionCue: community feed (posts + composer, session/drill attachments render as cards with a "View session analysis" link), Latest Drills (cards: name, tags, difficulty chip, players, Add to my drills = duplicate), Activity list + online players.
-
-### Presence + invites (LAN)
-
-WS `hello` gains optional `playerId`. Server keeps in-memory presence `{playerId: connCount}`; `GET /presence` → `[{playerId, name, initials, color, online:true}]` (players with ≥1 conn). Broadcast WS `{"type":"presence","online":[playerIds]}` on change.
-
-In-memory invites: `POST /invites {fromPlayerId, toPlayerId, mode:"drill|target_pool|instant_recall", drillId?, rounds}` → id; WS broadcast `{"type":"invite","invite":{id,from:{...},to:{...},mode,drillName,rounds,status:"pending"}}`. `POST /invites/{id}/accept` → creates the session (both players), broadcasts updated invite + `game` snapshot. `POST /invites/{id}/decline`. Invites expire after 120 s.
-
-Web: online players list shows Invite buttons opening a FusionCue-style modal (game type, drill search, rounds 3/5/7/9/15); incoming invite = toast on every surface with Accept/Decline.
+Explicitly out of scope (user decision 2026-07-28): no posts, no activity feed, no presence, no invites, no multiplayer beyond the existing local shared sessions. Do not build these.
 
 ### Voice transcript banner
 
